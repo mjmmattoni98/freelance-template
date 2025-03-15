@@ -20,7 +20,7 @@
 </script>
 
 <div
-  class="card border-surface-100-900 grid h-[760px] w-full grid-cols-[auto_1fr] border-[1px]"
+  class="card border-surface-100-900 grid h-[760px] w-full grid-cols-1 md:grid-cols-[auto_1fr] border-[1px]"
 >
   <!-- Component -->
   <Navigation.Rail expanded={isExpanded}>
@@ -28,8 +28,10 @@
       <Navigation.Tile
         labelExpanded="Menu"
         onclick={toggleExpanded}
-        title="Toggle Menu Width"><IconMenu /></Navigation.Tile
+        title="Toggle Menu Width"
       >
+        <IconMenu />
+      </Navigation.Tile>
     {/snippet}
     {#snippet tiles()}
       <Navigation.Tile labelExpanded="Browse Files" href="#/files">
@@ -58,6 +60,6 @@
   </Navigation.Rail>
   <!-- Content -->
   <div class="flex items-center justify-center">
-    {@render children()}
+    <main>{@render children()}</main>
   </div>
 </div>

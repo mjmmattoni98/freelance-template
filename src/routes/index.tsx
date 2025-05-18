@@ -4,6 +4,7 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { getSignInUrl } from "../authkit/serverFunctions";
 import SignInButton from "../components/sign-in-button";
+import { startSpan } from "@sentry/tanstackstart-react";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -46,6 +47,26 @@ function Home() {
           <Text size="5" color="gray" mb="4">
             Sign in to view your account details
           </Text>
+          <button
+            type="button"
+            onClick={async () => {
+              await startSpan(
+                {
+                  name: "Example Frontend Span",
+                  op: "test",
+                },
+                async () => {
+                  const res = await fetch("/api/sentry-example-api");
+                  if (!res.ok) {
+                    throw new Error("Sentry Example Frontend Error");
+                  }
+                }
+              );
+            }}
+          >
+            Break the world
+          </button>
+
           <h1 className="text-4xl font-bold underline">
             Welcome to the AuthKit Example
           </h1>

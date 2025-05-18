@@ -3,6 +3,7 @@ import { NotFound } from "@/components/NotFound";
 import { TRPCRouter } from "@/trpc/router";
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 import { Box, Button, Card, Container, Flex, Theme } from "@radix-ui/themes";
+import { wrapCreateRootRouteWithSentry } from "@sentry/tanstackstart-react";
 import { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
@@ -26,10 +27,12 @@ import appCss from "../styles/app.css?url";
 import "@mantine/core/styles.css";
 import "@radix-ui/themes/styles.css";
 
-export const Route = createRootRouteWithContext<{
-  queryClient: QueryClient;
-  trpc: TRPCOptionsProxy<TRPCRouter>;
-}>()({
+export const Route = wrapCreateRootRouteWithSentry(
+  createRootRouteWithContext<{
+    queryClient: QueryClient;
+    trpc: TRPCOptionsProxy<TRPCRouter>;
+  }>
+)()({
   head: () => ({
     meta: [
       {

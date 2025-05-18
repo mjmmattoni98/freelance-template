@@ -1,5 +1,11 @@
 {
-  "cSpell.words": ["authkit", "jose", "workos", "WORKOS"],
+  "cSpell.words": [
+    "authkit",
+    "jose",
+    "tanstackstart",
+    "workos",
+    "WORKOS"
+  ],
   "cssVariables.lookupFiles": [
     "**/*.css",
     "**/*.scss",

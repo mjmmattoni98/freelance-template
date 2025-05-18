@@ -1,7 +1,8 @@
 import { defineConfig } from "@tanstack/react-start/config";
 import tsConfigPaths from "vite-tsconfig-paths";
+import { wrapVinxiConfigWithSentry } from "@sentry/tanstackstart-react";
 
-export default defineConfig({
+export const config = defineConfig({
   tsr: {
     appDirectory: "src",
   },
@@ -15,4 +16,14 @@ export default defineConfig({
       }),
     ],
   },
+});
+
+export default wrapVinxiConfigWithSentry(config, {
+  org: "antsolutions",
+  project: "javascript-tanstackstart-react",
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+
+  // Only print logs for uploading source maps in CI
+  // Set to `true` to suppress logs
+  silent: !process.env.CI,
 });

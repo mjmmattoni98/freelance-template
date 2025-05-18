@@ -1,27 +1,45 @@
-import { Box, Button, Card, Container, Flex, Theme } from '@radix-ui/themes';
-import '@radix-ui/themes/styles.css';
-import { HeadContent, Link, Outlet, Scripts, createRootRoute } from '@tanstack/react-router';
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
-import { Suspense } from 'react';
-import { getAuth, getSignInUrl } from '../authkit/serverFunctions';
-import Footer from '../components/footer';
-import SignInButton from '../components/sign-in-button';
-import type { ReactNode } from 'react';
+import { Box, Button, Card, Container, Flex, Theme } from "@radix-ui/themes";
+import "@radix-ui/themes/styles.css";
+import { QueryClient } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import {
+  HeadContent,
+  Link,
+  Outlet,
+  Scripts,
+  createRootRouteWithContext,
+} from "@tanstack/react-router";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { TRPCOptionsProxy } from "@trpc/tanstack-react-query";
+import type { ReactNode } from "react";
+import { Suspense } from "react";
+import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary";
+import { NotFound } from "~/components/NotFound";
+import { TRPCRouter } from "~/trpc/router";
+import { getAuth, getSignInUrl } from "../authkit/serverFunctions";
+import Footer from "../components/footer";
+import SignInButton from "../components/sign-in-button";
+//@ts-ignore
+import appCss from "../styles/app.css?url";
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient;
+  trpc: TRPCOptionsProxy<TRPCRouter>;
+}>()({
   head: () => ({
     meta: [
       {
-        charSet: 'utf-8',
+        charSet: "utf-8",
       },
       {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
+        name: "viewport",
+        content: "width=device-width, initial-scale=1",
       },
       {
-        title: 'AuthKit Example in TanStack Start',
+        title: "AuthKit Example in TanStack Start",
       },
     ],
+    links: [{ rel: 'stylesheet', href: appCss }],
   }),
   beforeLoad: async () => {
     const { user } = await getAuth();
@@ -36,16 +54,32 @@ export const Route = createRootRoute({
       url,
     };
   },
+  errorComponent: (props) => {
+    return (
+      <RootDocument>
+        <DefaultCatchBoundary {...props} />
+      </RootDocument>
+    );
+  },
+  notFoundComponent: () => <NotFound />,
   component: RootComponent,
-  notFoundComponent: () => <div>Not Found</div>,
+  // component: () => (
+  //   <RootDocument>
+  //     <Outlet />
+  //   </RootDocument>
+  // ),
 });
 
 function RootComponent() {
   const { user, url } = Route.useLoaderData();
   return (
     <RootDocument>
-      <Theme accentColor="iris" panelBackground="solid" style={{ backgroundColor: 'var(--gray-1)' }}>
-        <Container style={{ backgroundColor: 'var(--gray-1)' }}>
+      <Theme
+        accentColor="iris"
+        panelBackground="solid"
+        style={{ backgroundColor: "var(--gray-1)" }}
+      >
+        <Container style={{ backgroundColor: "var(--gray-1)" }}>
           <Flex direction="column" gap="5" p="5" height="100vh">
             <Box asChild flexGrow="1">
               <Card size="4">
@@ -54,12 +88,34 @@ function RootComponent() {
                     <header>
                       <Flex gap="4">
                         <Button asChild variant="soft">
-                          <Link to="/">Home</Link>
+                          <Link
+                            to="/"
+                            activeProps={{
+                              className: "font-bold",
+                            }}
+                            activeOptions={{ exact: true }}
+                          >
+                            Home
+                          </Link>
                         </Button>
-
                         <Button asChild variant="soft">
-                          <Link to="/account">Account</Link>
+                          <Link
+                            to="/account"
+                            activeProps={{
+                              className: "font-bold",
+                            }}
+                          >
+                            Account
+                          </Link>
                         </Button>
+                        <Link
+                          to="/posts"
+                          activeProps={{
+                            className: "font-bold",
+                          }}
+                        >
+                          Posts
+                        </Link>
                       </Flex>
 
                       <Suspense fallback={<div>Loading...</div>}>
@@ -81,13 +137,14 @@ function RootComponent() {
         </Container>
       </Theme>
       <TanStackRouterDevtools position="bottom-right" />
+      <ReactQueryDevtools buttonPosition="bottom-left" position="bottom" />
     </RootDocument>
   );
 }
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html>
+    <html lang="en">
       <head>
         <HeadContent />
       </head>

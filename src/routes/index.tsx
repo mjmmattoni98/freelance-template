@@ -1,9 +1,9 @@
-import { Button, Flex, Heading, Text } from '@radix-ui/themes';
-import { Link, createFileRoute } from '@tanstack/react-router';
-import { getSignInUrl } from '../authkit/serverFunctions';
-import SignInButton from '../components/sign-in-button';
+import { Button, Flex, Heading, Text } from "@radix-ui/themes";
+import { Link, createFileRoute } from "@tanstack/react-router";
+import { getSignInUrl } from "../authkit/serverFunctions";
+import SignInButton from "../components/sign-in-button";
 
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute("/")({
   component: Home,
   loader: async ({ context }) => {
     const { user } = context;
@@ -19,7 +19,9 @@ function Home() {
     <Flex direction="column" align="center" gap="2">
       {user ? (
         <>
-          <Heading size="8">Welcome back{user?.firstName && `, ${user?.firstName}`}</Heading>
+          <Heading size="8">
+            Welcome back{user?.firstName && `, ${user?.firstName}`}
+          </Heading>
           <Text size="5" color="gray">
             You are now authenticated into the application
           </Text>
@@ -37,6 +39,7 @@ function Home() {
           <Text size="5" color="gray" mb="4">
             Sign in to view your account details
           </Text>
+          <h1 className="text-4xl font-bold underline">Welcome to the AuthKit Example</h1>
           <SignInButton user={user} url={url} large />
         </>
       )}

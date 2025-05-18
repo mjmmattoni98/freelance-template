@@ -10,128 +10,261 @@
 
 // Import Routes
 
-import { Route as rootRoute } from './routes/__root';
-import { Route as LogoutImport } from './routes/logout';
-import { Route as AuthenticatedImport } from './routes/_authenticated';
-import { Route as IndexImport } from './routes/index';
-import { Route as AuthenticatedAccountImport } from './routes/_authenticated/account';
+import { Route as rootRoute } from './routes/__root'
+import { Route as RedirectImport } from './routes/redirect'
+import { Route as PostsImport } from './routes/posts'
+import { Route as LogoutImport } from './routes/logout'
+import { Route as AuthenticatedImport } from './routes/_authenticated'
+import { Route as IndexImport } from './routes/index'
+import { Route as PostsIndexImport } from './routes/posts.index'
+import { Route as PostsPostIdImport } from './routes/posts.$postId'
+import { Route as AuthenticatedAccountImport } from './routes/_authenticated/account'
+import { Route as PostsPostIdDeepImport } from './routes/posts_.$postId.deep'
 
 // Create/Update Routes
+
+const RedirectRoute = RedirectImport.update({
+  id: '/redirect',
+  path: '/redirect',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const PostsRoute = PostsImport.update({
+  id: '/posts',
+  path: '/posts',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const LogoutRoute = LogoutImport.update({
   id: '/logout',
   path: '/logout',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
 const AuthenticatedRoute = AuthenticatedImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
+
+const PostsIndexRoute = PostsIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PostsRoute,
+} as any)
+
+const PostsPostIdRoute = PostsPostIdImport.update({
+  id: '/$postId',
+  path: '/$postId',
+  getParentRoute: () => PostsRoute,
+} as any)
 
 const AuthenticatedAccountRoute = AuthenticatedAccountImport.update({
   id: '/account',
   path: '/account',
   getParentRoute: () => AuthenticatedRoute,
-} as any);
+} as any)
+
+const PostsPostIdDeepRoute = PostsPostIdDeepImport.update({
+  id: '/posts_/$postId/deep',
+  path: '/posts/$postId/deep',
+  getParentRoute: () => rootRoute,
+} as any)
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
     '/': {
-      id: '/';
-      path: '/';
-      fullPath: '/';
-      preLoaderRoute: typeof IndexImport;
-      parentRoute: typeof rootRoute;
-    };
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
     '/_authenticated': {
-      id: '/_authenticated';
-      path: '';
-      fullPath: '';
-      preLoaderRoute: typeof AuthenticatedImport;
-      parentRoute: typeof rootRoute;
-    };
+      id: '/_authenticated'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthenticatedImport
+      parentRoute: typeof rootRoute
+    }
     '/logout': {
-      id: '/logout';
-      path: '/logout';
-      fullPath: '/logout';
-      preLoaderRoute: typeof LogoutImport;
-      parentRoute: typeof rootRoute;
-    };
+      id: '/logout'
+      path: '/logout'
+      fullPath: '/logout'
+      preLoaderRoute: typeof LogoutImport
+      parentRoute: typeof rootRoute
+    }
+    '/posts': {
+      id: '/posts'
+      path: '/posts'
+      fullPath: '/posts'
+      preLoaderRoute: typeof PostsImport
+      parentRoute: typeof rootRoute
+    }
+    '/redirect': {
+      id: '/redirect'
+      path: '/redirect'
+      fullPath: '/redirect'
+      preLoaderRoute: typeof RedirectImport
+      parentRoute: typeof rootRoute
+    }
     '/_authenticated/account': {
-      id: '/_authenticated/account';
-      path: '/account';
-      fullPath: '/account';
-      preLoaderRoute: typeof AuthenticatedAccountImport;
-      parentRoute: typeof AuthenticatedImport;
-    };
+      id: '/_authenticated/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AuthenticatedAccountImport
+      parentRoute: typeof AuthenticatedImport
+    }
+    '/posts/$postId': {
+      id: '/posts/$postId'
+      path: '/$postId'
+      fullPath: '/posts/$postId'
+      preLoaderRoute: typeof PostsPostIdImport
+      parentRoute: typeof PostsImport
+    }
+    '/posts/': {
+      id: '/posts/'
+      path: '/'
+      fullPath: '/posts/'
+      preLoaderRoute: typeof PostsIndexImport
+      parentRoute: typeof PostsImport
+    }
+    '/posts_/$postId/deep': {
+      id: '/posts_/$postId/deep'
+      path: '/posts/$postId/deep'
+      fullPath: '/posts/$postId/deep'
+      preLoaderRoute: typeof PostsPostIdDeepImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
 // Create and export the route tree
 
 interface AuthenticatedRouteChildren {
-  AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute;
+  AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
-};
+}
 
-const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(AuthenticatedRouteChildren);
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
+interface PostsRouteChildren {
+  PostsPostIdRoute: typeof PostsPostIdRoute
+  PostsIndexRoute: typeof PostsIndexRoute
+}
+
+const PostsRouteChildren: PostsRouteChildren = {
+  PostsPostIdRoute: PostsPostIdRoute,
+  PostsIndexRoute: PostsIndexRoute,
+}
+
+const PostsRouteWithChildren = PostsRoute._addFileChildren(PostsRouteChildren)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute;
-  '': typeof AuthenticatedRouteWithChildren;
-  '/logout': typeof LogoutRoute;
-  '/account': typeof AuthenticatedAccountRoute;
+  '/': typeof IndexRoute
+  '': typeof AuthenticatedRouteWithChildren
+  '/logout': typeof LogoutRoute
+  '/posts': typeof PostsRouteWithChildren
+  '/redirect': typeof RedirectRoute
+  '/account': typeof AuthenticatedAccountRoute
+  '/posts/$postId': typeof PostsPostIdRoute
+  '/posts/': typeof PostsIndexRoute
+  '/posts/$postId/deep': typeof PostsPostIdDeepRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute;
-  '': typeof AuthenticatedRouteWithChildren;
-  '/logout': typeof LogoutRoute;
-  '/account': typeof AuthenticatedAccountRoute;
+  '/': typeof IndexRoute
+  '': typeof AuthenticatedRouteWithChildren
+  '/logout': typeof LogoutRoute
+  '/redirect': typeof RedirectRoute
+  '/account': typeof AuthenticatedAccountRoute
+  '/posts/$postId': typeof PostsPostIdRoute
+  '/posts': typeof PostsIndexRoute
+  '/posts/$postId/deep': typeof PostsPostIdDeepRoute
 }
 
 export interface FileRoutesById {
-  __root__: typeof rootRoute;
-  '/': typeof IndexRoute;
-  '/_authenticated': typeof AuthenticatedRouteWithChildren;
-  '/logout': typeof LogoutRoute;
-  '/_authenticated/account': typeof AuthenticatedAccountRoute;
+  __root__: typeof rootRoute
+  '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/logout': typeof LogoutRoute
+  '/posts': typeof PostsRouteWithChildren
+  '/redirect': typeof RedirectRoute
+  '/_authenticated/account': typeof AuthenticatedAccountRoute
+  '/posts/$postId': typeof PostsPostIdRoute
+  '/posts/': typeof PostsIndexRoute
+  '/posts_/$postId/deep': typeof PostsPostIdDeepRoute
 }
 
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: '/' | '' | '/logout' | '/account';
-  fileRoutesByTo: FileRoutesByTo;
-  to: '/' | '' | '/logout' | '/account';
-  id: '__root__' | '/' | '/_authenticated' | '/logout' | '/_authenticated/account';
-  fileRoutesById: FileRoutesById;
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths:
+    | '/'
+    | ''
+    | '/logout'
+    | '/posts'
+    | '/redirect'
+    | '/account'
+    | '/posts/$postId'
+    | '/posts/'
+    | '/posts/$postId/deep'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | ''
+    | '/logout'
+    | '/redirect'
+    | '/account'
+    | '/posts/$postId'
+    | '/posts'
+    | '/posts/$postId/deep'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/logout'
+    | '/posts'
+    | '/redirect'
+    | '/_authenticated/account'
+    | '/posts/$postId'
+    | '/posts/'
+    | '/posts_/$postId/deep'
+  fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
-  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren;
-  LogoutRoute: typeof LogoutRoute;
+  IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  LogoutRoute: typeof LogoutRoute
+  PostsRoute: typeof PostsRouteWithChildren
+  RedirectRoute: typeof RedirectRoute
+  PostsPostIdDeepRoute: typeof PostsPostIdDeepRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LogoutRoute: LogoutRoute,
-};
+  PostsRoute: PostsRouteWithChildren,
+  RedirectRoute: RedirectRoute,
+  PostsPostIdDeepRoute: PostsPostIdDeepRoute,
+}
 
-export const routeTree = rootRoute._addFileChildren(rootRouteChildren)._addFileTypes<FileRouteTypes>();
+export const routeTree = rootRoute
+  ._addFileChildren(rootRouteChildren)
+  ._addFileTypes<FileRouteTypes>()
 
 /* ROUTE_MANIFEST_START
 {
@@ -141,7 +274,10 @@ export const routeTree = rootRoute._addFileChildren(rootRouteChildren)._addFileT
       "children": [
         "/",
         "/_authenticated",
-        "/logout"
+        "/logout",
+        "/posts",
+        "/redirect",
+        "/posts_/$postId/deep"
       ]
     },
     "/": {
@@ -156,9 +292,30 @@ export const routeTree = rootRoute._addFileChildren(rootRouteChildren)._addFileT
     "/logout": {
       "filePath": "logout.tsx"
     },
+    "/posts": {
+      "filePath": "posts.tsx",
+      "children": [
+        "/posts/$postId",
+        "/posts/"
+      ]
+    },
+    "/redirect": {
+      "filePath": "redirect.tsx"
+    },
     "/_authenticated/account": {
       "filePath": "_authenticated/account.tsx",
       "parent": "/_authenticated"
+    },
+    "/posts/$postId": {
+      "filePath": "posts.$postId.tsx",
+      "parent": "/posts"
+    },
+    "/posts/": {
+      "filePath": "posts.index.tsx",
+      "parent": "/posts"
+    },
+    "/posts_/$postId/deep": {
+      "filePath": "posts_.$postId.deep.tsx"
     }
   }
 }
